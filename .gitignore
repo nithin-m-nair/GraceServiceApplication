@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+
+# Local configuration (SDK path, etc.)
+local.properties
+
+# IntelliJ / Android Studio
+*.iml
+.idea/
+
+# macOS
+.DS_Store
+
+# Generated files
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keystore files (don’t commit secrets)
+*.jks
+*.keystore
+
+# Logs
+*.log
