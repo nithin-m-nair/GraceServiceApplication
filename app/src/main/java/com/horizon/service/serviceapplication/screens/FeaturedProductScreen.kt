@@ -1,5 +1,6 @@
 package com.horizon.service.serviceapplication.screens
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -235,7 +236,24 @@ fun FeaturedProductScreen(
             // WhatsApp Button (fixed height, not weighted)
             Button(
                 onClick = {
-                    // your WhatsApp intent logic
+                    val message = """
+            Hello! 👋
+
+            I am interested in your product and would like more information.
+
+            Product Details:
+            - Product Name: $productName
+            - Model/ID: $manufacturer
+
+            Could you please provide more details about pricing, availability, and delivery options?
+
+            Thank you!
+        """.trimIndent()
+                    sendWhatsAppMessages(
+                        context = context,
+                        phone = contactNumber,
+                        message = message
+                    )
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
                 modifier = Modifier
@@ -255,6 +273,19 @@ fun FeaturedProductScreen(
 
     }
 }
+
+fun sendWhatsAppMessages(context: Context, phone: String, message: String) {
+    try {
+        val uri = Uri.parse("https://wa.me/$phone?text=${Uri.encode(message)}")
+        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+            setPackage("com.whatsapp")
+        }
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Toast.makeText(context, "WhatsApp not installed.", Toast.LENGTH_SHORT).show()
+    }
+}
+
 
 @Composable
 fun ContactRowWithCallButton(contactNumber: String) {

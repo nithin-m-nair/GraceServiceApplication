@@ -1,8 +1,10 @@
 package com.horizon.service.serviceapplication.screens
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.util.Log
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -90,6 +92,7 @@ fun ServiceRequestScreen(navController: NavController,
     var location by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedIndex by remember { mutableStateOf(-1) }
+    var selectedItemPhone by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val requestState by viewModel.requestState.collectAsState()
@@ -205,7 +208,9 @@ fun ServiceRequestScreen(navController: NavController,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
-                            .clickable { selectedIndex = index }
+                            .clickable { selectedIndex = index
+                                selectedItemPhone = productItem[index].phone.toString()
+                            }
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp).fillMaxWidth(),
@@ -213,7 +218,7 @@ fun ServiceRequestScreen(navController: NavController,
                         ) {
                             RadioButton(
                                 selected = isSelected,
-                                onClick = { selectedIndex = index },
+                                onClick = { selectedIndex = index},
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = Color(0xFF65984B),
                                     unselectedColor = Color.Gray
@@ -325,6 +330,12 @@ fun ServiceRequestScreen(navController: NavController,
             LaunchedEffect(Unit) {
                 showCustomToast(context, "Request Submitted Successfully!", true)
                 viewModel.resetState()
+                val productName = productItem[selectedIndex].name
+                val message = """
+            Hi i'm $name placing a service request at $currentDate  for the product $productName, my current issue is $description and my location is $location  you can contact me at $phone 
+        """.trimIndent()
+                Log.d("selected phone number","$selectedItemPhone")
+                sendWhatsAppMessage(context, selectedItemPhone, message)
                 navController.popBackStack()
             }
         }
@@ -338,6 +349,17 @@ fun ServiceRequestScreen(navController: NavController,
         }
 
         else -> {}
+    }
+}
+fun sendWhatsAppMessage(context: Context, phone: String, message: String) {
+    try {
+        val uri = Uri.parse("https://wa.me/$phone?text=${Uri.encode(message)}")
+        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+            setPackage("com.whatsapp")
+        }
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Toast.makeText(context, "WhatsApp not installed.", Toast.LENGTH_SHORT).show()
     }
 }
 
