@@ -19,14 +19,15 @@ import com.horizon.service.serviceapplication.R
 fun NetworkImage(
     url: String,
     contentDescription: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop
 ) {
     AsyncImage(
         model = url,
         contentDescription = contentDescription,
-        contentScale = ContentScale.Fit,
+        contentScale = ContentScale.FillBounds,
         modifier = modifier.fillMaxSize(),
         placeholder = painterResource(R.drawable.image_placeholder),
-        error = painterResource(R.drawable.image_error)
+        error = painterResource(R.drawable.image_error),
     )
 }

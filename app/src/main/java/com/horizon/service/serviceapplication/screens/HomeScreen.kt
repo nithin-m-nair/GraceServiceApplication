@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,7 +59,7 @@ fun HomeScreen(navController: NavController?=null,
 
         // 🔹 Foreground Content
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
             // AppBar Section with solid color
             Box(
@@ -321,8 +323,9 @@ fun PromoCard(item: FeaturedItemData, modifier: Modifier = Modifier, navControll
             url = item.image.toString(),
             contentDescription = item.name.toString(),
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .height(400.dp), // set the height you want
+            contentScale = ContentScale.Fit
         )
     }
 }
