@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -65,25 +67,42 @@ fun HomeScreen(navController: NavController?=null,
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(116.dp) // solid background color
+                    .height(136.dp) // solid background color
             )
             {
 
-                Spacer(Modifier.height(60.dp))
+                Spacer(Modifier.height(50.dp))
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 20.dp, 20.dp, 0.dp),
+                        .padding(20.dp, 40.dp, 20.dp, 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+                )
+                {
                     // Left logo
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_text),
-                        contentDescription = "Left Logo",
-                        modifier = Modifier.size(100.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp) // container size
+                            .border(
+                                width = 3.dp,
+                                color = colorResource(id = R.color.splash_bg),
+                                shape = RoundedCornerShape(12.dp) // or CircleShape
+                            )
+                            .background(        // ✅ background inside border
+                                color = colorResource(id = R.color.splash_bg), // change to your desired color
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(5.dp), // padding between border & image
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.app_logo),
+                            contentDescription = "Left Logo",
+                            modifier = Modifier.size(80.dp) // smaller so it fits well inside background
+                        )
+                    }
 
                     // Right logo
                     Image(
