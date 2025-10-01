@@ -66,7 +66,8 @@ fun HomeScreen(navController: NavController?=null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(116.dp) // solid background color
-            ) {
+            )
+            {
 
                 Spacer(Modifier.height(60.dp))
 
@@ -111,7 +112,8 @@ fun HomeScreen(navController: NavController?=null,
                     .fillMaxWidth()
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
-            ) {
+            )
+            {
                // PromoContent(navController!!)
                 when (promoState) {
                     is PromoUiState.Error ->Text(

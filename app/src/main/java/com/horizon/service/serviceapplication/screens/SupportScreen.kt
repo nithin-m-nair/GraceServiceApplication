@@ -157,18 +157,18 @@ fun HelpSupportScreen(
             ContactCard(
                 icon = R.drawable.phone,
                 title = "Phone Support",
-                value = "+91 9946650557",
+                value = "+91 7559940557",
                 isPhone = true,
                 onCallClick = {
                     val intent = Intent(Intent.ACTION_DIAL).apply {
-                        data = Uri.parse("tel:+919946650557")
+                        data = Uri.parse("tel:+917559940557")
                     }
                     context.startActivity(intent)
                 },
                 onCopyClick = {
                     val clipboard =
                         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("Phone", "+91 9946650557")
+                    val clip = ClipData.newPlainText("Phone", "+91 7559940557")
                     clipboard.setPrimaryClip(clip)
                     Toast.makeText(context, "Number copied", Toast.LENGTH_SHORT).show()
                 }
