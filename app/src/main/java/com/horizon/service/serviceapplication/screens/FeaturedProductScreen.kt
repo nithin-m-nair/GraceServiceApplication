@@ -226,7 +226,7 @@ fun FeaturedProductScreen(
 
                         Spacer(Modifier.height(12.dp))
 
-                        ContactRowWithCallButton(contactNumber)
+                        ContactRowWithCallButton("917559940557")
                     }
                 }
             }
