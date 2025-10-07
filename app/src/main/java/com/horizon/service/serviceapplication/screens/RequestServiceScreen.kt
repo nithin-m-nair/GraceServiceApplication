@@ -2,6 +2,7 @@ package com.horizon.service.serviceapplication.screens
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -351,17 +352,52 @@ fun ServiceRequestScreen(navController: NavController,
         else -> {}
     }
 }
+
 fun sendWhatsAppMessage(context: Context, phone: String, message: String) {
+    val pm = context.packageManager
+    val encodedMessage = Uri.encode(message)
+    val uri = Uri.parse("https://wa.me/91$phone?text=$encodedMessage")
+
+    val possiblePackages = listOf(
+        "com.whatsapp",          // Regular WhatsApp
+        "com.whatsapp.w4b",      // WhatsApp Business
+        "com.whatsappclone",     // Dual App (MIUI)
+        "com.whatsapp.w4bclone"  // Business Dual App
+    )
+
     try {
-        val uri = Uri.parse("https://wa.me/$phone?text=${Uri.encode(message)}")
-        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-            setPackage("com.whatsapp")
+        // Try all possible package names
+        for (pkg in possiblePackages) {
+            if (isPackageInstalled(pkg, pm)) {
+                val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+                    setPackage(pkg)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+                return
+            }
         }
-        context.startActivity(intent)
+
+        // If no package found, fallback without specifying
+        val fallbackIntent = Intent(Intent.ACTION_VIEW, uri)
+        context.startActivity(fallbackIntent)
+
     } catch (e: Exception) {
-        Toast.makeText(context, "WhatsApp not installed.", Toast.LENGTH_SHORT).show()
+        e.printStackTrace()
+        Toast.makeText(context, "WhatsApp not installed or cannot be opened.", Toast.LENGTH_SHORT).show()
     }
 }
+
+private fun isPackageInstalled(packageName: String, pm: PackageManager): Boolean {
+    return try {
+        pm.getPackageInfo(packageName, 0)
+        true
+    } catch (_: PackageManager.NameNotFoundException) {
+        false
+    }
+}
+
+
 
 
 
