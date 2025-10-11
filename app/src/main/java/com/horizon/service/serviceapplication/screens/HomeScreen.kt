@@ -1,6 +1,5 @@
 package com.horizon.service.serviceapplication.screens
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,10 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,75 +40,66 @@ import com.horizon.service.serviceapplication.viewModels.PromoUiState
 import kotlinx.coroutines.delay
 
 @Composable
-fun HomeScreen(navController: NavController?=null,
-               viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                   factory = HomeViewModelFactory(Repo(RetrofitApiService())) // for Android
-               )) {
+fun HomeScreen(
+    navController: NavController? = null,
+    viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = HomeViewModelFactory(Repo(RetrofitApiService()))
+    )
+) {
     val promoState by viewModel.promoState.collectAsState()
-    // Wrap entire layout in a Box so we can layer components
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 🔹 Screen Background (solid green)
-        Box(
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // 🔹 Scrollable content
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-        )
-
-        // 🔹 Foreground Content
-        Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 180.dp) // Padding to avoid overlap with bottom card
         ) {
-            // AppBar Section with solid color
+            // 🔹 AppBar Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(136.dp) // solid background color
-            )
-            {
-
+                    .height(136.dp)
+            ) {
                 Spacer(Modifier.height(50.dp))
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp, 40.dp, 20.dp, 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
-                )
-                {
+                ) {
                     // Left logo
                     Box(
                         modifier = Modifier
-                            .size(100.dp) // container size
+                            .size(100.dp)
                             .border(
                                 width = 3.dp,
                                 color = colorResource(id = R.color.splash_bg),
-                                shape = RoundedCornerShape(12.dp) // or CircleShape
-                            )
-                            .background(        // ✅ background inside border
-                                color = colorResource(id = R.color.splash_bg), // change to your desired color
                                 shape = RoundedCornerShape(12.dp)
                             )
-                            .padding(5.dp), // padding between border & image
+                            .background(
+                                color = colorResource(id = R.color.splash_bg),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(5.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.app_logo),
                             contentDescription = "Left Logo",
-                            modifier = Modifier.size(80.dp) // smaller so it fits well inside background
+                            modifier = Modifier.size(80.dp)
                         )
                     }
 
-                    // Right logo
+                    // Right icon
                     Image(
                         painter = painterResource(id = R.drawable.settings),
-                        contentDescription = "Right Logo",
+                        contentDescription = "Settings",
                         modifier = Modifier
                             .size(30.dp)
-                            .clickable {
-                                navController?.navigate("support")
-                            },
+                            .clickable { navController?.navigate("support") },
                         colorFilter = ColorFilter.tint(Color(0xFF000000))
                     )
                 }
@@ -123,104 +110,101 @@ fun HomeScreen(navController: NavController?=null,
                 )
             }
 
-
-            // Promo Content (middle part, stays green)
+            // 🔹 Promo Section
             Box(
                 modifier = Modifier
-                    .weight(0.7f)
                     .fillMaxWidth()
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
-            )
-            {
-               // PromoContent(navController!!)
+            ) {
                 when (promoState) {
-                    is PromoUiState.Error ->Text(
+                    is PromoUiState.Error -> Text(
                         text = (promoState as PromoUiState.Error).message,
                         color = Color.Red
                     )
+
                     PromoUiState.Loading -> CircularProgressIndicator()
+
                     is PromoUiState.Success -> PromoContent(
                         navController!!,
                         (promoState as PromoUiState.Success).items
                     )
                 }
             }
+        }
 
-            // Bottom Card with texture background
-            Card(
-                modifier = Modifier
-                    .weight(0.3f)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                elevation = CardDefaults.cardElevation(8.dp)
-            )
-            {
-                Box(
-                    modifier = Modifier.fillMaxSize()
+        // 🔹 Bottom Card — anchored
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter),
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Image(
+                    painter = painterResource(id = R.drawable.texture),
+                    contentDescription = "Texture Background",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.texture),
-                        contentDescription = "Bottom Card Texture",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.matchParentSize()
+                    Text(
+                        text = "Need Service?",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.Black
                     )
-
-                    Column(
+                    Spacer(Modifier.height(20.dp))
+                    Card(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(start = 24.dp, end = 24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceEvenly
+                            .wrapContentWidth()
+                            .height(60.dp)
+                            .clickable {
+                                navController?.currentBackStackEntry?.savedStateHandle?.set(
+                                    "data",
+                                    (promoState as? PromoUiState.Success)?.items
+                                )
+                                navController?.navigate("serviceRequest")
+                            },
+                        shape = RoundedCornerShape(50.dp),
+                        elevation = CardDefaults.cardElevation(0.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black
+                        ),
+                        border = BorderStroke(1.dp, Color.LightGray)
                     ) {
-                        Text(
-                            text = "Need Service?",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = Color.Black
-                        )
-
-                        Card(
+                        Row(
                             modifier = Modifier
                                 .wrapContentWidth()
-                                .height(60.dp)
-                                .clickable {
-                                    navController?.currentBackStackEntry?.savedStateHandle?.set("data", (promoState as PromoUiState.Success).items)
-                                    navController?.navigate("serviceRequest")
-                                           },
-                            shape = RoundedCornerShape(50.dp),
-                            elevation = CardDefaults.cardElevation(0.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White, // background
-                                contentColor = Color.Black    // text/icon color
-                            ),
-                            border = BorderStroke(1.dp, Color.LightGray)
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.request_service),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(50.dp),
-                                    tint = Color.Unspecified
+                            Icon(
+                                painter = painterResource(id = R.drawable.request_service),
+                                contentDescription = null,
+                                modifier = Modifier.size(50.dp),
+                                tint = Color.Unspecified
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Request Service",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.Black
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Request Service",
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color.Black
-                                    )
-                                )
-                            }
+                            )
                         }
-
                     }
                 }
             }
@@ -228,30 +212,31 @@ fun HomeScreen(navController: NavController?=null,
     }
 }
 
+
+
 @Composable
 fun PromoContent(navController: NavController, promoItems: List<FeaturedItemData>) {
-
     val pagerState = rememberPagerState(pageCount = { promoItems.size })
 
-    // 🔄 Auto-scroll effect
+    // Auto-scroll logic
     LaunchedEffect(pagerState) {
         while (true) {
-            delay(3000) // 3 seconds per page
+            delay(3000)
             val nextPage = (pagerState.currentPage + 1) % promoItems.size
             pagerState.animateScrollToPage(nextPage)
         }
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HorizontalPager(
             state = pagerState,
             pageSize = PageSize.Fill,
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .heightIn(min = 300.dp, max = 500.dp) // responsive height
         ) { page ->
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -259,9 +244,7 @@ fun PromoContent(navController: NavController, promoItems: List<FeaturedItemData
             ) {
                 PromoCard(
                     item = promoItems[page],
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
+                    modifier = Modifier.fillMaxWidth(),
                     navController = navController
                 )
             }
@@ -292,11 +275,11 @@ fun PromoContent(navController: NavController, promoItems: List<FeaturedItemData
 @Composable
 fun PromoCard(item: FeaturedItemData, modifier: Modifier = Modifier, navController: NavController) {
     Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    )
-    {
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Spacer(modifier = Modifier.height(12.dp))
+
         Text(
             text = item.name.toString(),
             style = MaterialTheme.typography.bodyLarge.copy(
@@ -316,7 +299,8 @@ fun PromoCard(item: FeaturedItemData, modifier: Modifier = Modifier, navControll
                 letterSpacing = 1.sp,
                 lineHeight = 20.sp
             ),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -331,7 +315,7 @@ fun PromoCard(item: FeaturedItemData, modifier: Modifier = Modifier, navControll
             }
         ) {
             Text(
-                text = "know more",
+                text = "Know more",
                 color = Color.Black,
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -345,7 +329,7 @@ fun PromoCard(item: FeaturedItemData, modifier: Modifier = Modifier, navControll
             contentDescription = item.name.toString(),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp), // set the height you want
+                .heightIn(min = 250.dp, max = 450.dp), // prevents squeezing
             contentScale = ContentScale.Fit
         )
     }
