@@ -7,6 +7,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("D:\\AndroidProjects\\ServiceApp\\keystore")
+            storePassword = "key2025"
+            keyAlias = "key0"
+            keyPassword = "key2025"
+        }
+    }
     namespace = "com.horizon.service.serviceapplication"
     compileSdk = 36
 
